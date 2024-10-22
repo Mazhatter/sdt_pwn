@@ -4,3 +4,7 @@
 
 文件更新 2024.10.22
 更新内容：增加了house of apple2的板子，范围是2.34-2.36。
+
+文件更新 2024.10.22
+更新内容：扩展了house of apple2的板子，范围是2.33-2.36.
+          增加ascii形式shellcode,以及22字节短shellcode
